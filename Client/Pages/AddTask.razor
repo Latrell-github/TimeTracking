@@ -1,0 +1,77 @@
+﻿@page "/addtask"
+@page "/edit-task/{taskId:int}"
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@* <EditForm Model="@task">
+    @if(taskId != 0)
+    {
+        <div class="form-group">
+            <label class="form-label" for="@task.Id">ID: </label>
+            <InputNumber class="form-control" @bind-Value="@task.Id" readonly />
+        </div>
+    }
+    <div class="form-group">
+        <label class="form-label" for="@task.Name">Name: </label>
+        <InputText class="form-control" @bind-Value="@task.Name" />
+    </div>
+     <div class="form-group">
+        <label class="form-label" for="@task.Description">Description: </label>
+        <InputTextArea class="form-control" @bind-Value="@task.Description" />
+     </div>
+</EditForm> 
+
+@if (taskId != 0)
+{
+    <button class="btn btn-outline-primary mt-3" @onclick="UpdateTask"> Update Task </button>
+}
+else
+{
+    <button class="btn btn-outline-primary mt-3" @onclick="SaveTask"> Add Task </button>
+}
+<button class="btn btn-outline-danger mt-3 mx-2" @onclick="Cancel"> Cancel </button> *@
+
+ <MudPaper Class="pa-4 mt-4">
+    <MudText Typo="Typo.h5">@Title Task</MudText>
+    <MudForm @ref="form">
+            <MudTextField T="string" @bind-Value="task.Name" Label="Name" Required="true" RequiredError="Task Name is required!" />
+            <MudTextField T="string" @bind-Value="task.Description" Label="Description" Lines="4" />
+    </MudForm>
+</MudPaper>
+<MudPaper Class="pa-4 mt-4">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" @onclick="SaveTask">Save</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" @onclick="Cancel" Class="mx-2">Cancel</MudButton>
+</MudPaper>
+
+@code {
+    [Parameter] public int taskId { get; set; }
+    public string Title = "Add";
+    public TaskState task = new();
+
+    MudForm form;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (taskId != 0)
+        {
+            Title = "Edit";
+            task = await Http.GetFromJsonAsync<TaskState>($"api/task/{taskId}");
+        }
+    }
+    protected async Task SaveTask()
+    {
+        await Http.PostAsJsonAsync("/api/task", task);
+        Cancel();
+    }
+
+    protected async Task UpdateTask()
+    {
+        await Http.PutAsJsonAsync("/api/task", task);
+    }
+
+    public void Cancel()
+    {
+        NavigationManager.NavigateTo("/task");
+    }
+}

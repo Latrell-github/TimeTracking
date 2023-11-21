@@ -1,0 +1,53 @@
+﻿@page "/task"
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+
+<PageTitle>Task</PageTitle>
+
+<MudButton OnClick="NewTask" Variant="Variant.Filled" Class="mt-4 mb-4" Color="Color.Primary">New Task</MudButton>
+
+@if (tasks == null)
+{
+    <h4>Loading...</h4>
+}
+else if (tasks.Count() == 0)
+{
+    <h4>Retrieving tasks...</h4>
+}
+else
+{
+    <MudGrid Spacing="2" Justify="Justify.Center" Class="row row-cols-3">
+        @foreach(var task in tasks)
+        {
+            <MudItem>
+                <TaskCard Id="@task.Id" TaskName="@task.Name" TaskDescription="@task.Description" />
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+    public List<TaskState>? tasks { get; set; } = new List<TaskState>();
+
+    // Dialogue Config
+    DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        tasks = await Http.GetFromJsonAsync<List<TaskState>>("api/task");
+    }
+
+    public void NewTask()
+    {
+        NavigationManager.NavigateTo("/addtask");
+    }
+
+    private void OpenDialog(DialogOptions options)
+    {
+        DialogService.Show<NewTaskDialogue>("New Task", options);
+    }
+
+}
