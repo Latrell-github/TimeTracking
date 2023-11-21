@@ -1,0 +1,31 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="task.Name" T="string" Label="Name"></MudTextField>
+        <MudTextField @bind-Value="task.Description" T="string" Label="Description"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private TaskState task = new();
+
+    private async void Submit()
+    {
+        await Http.PostAsJsonAsync("/api/task", task);
+        MudDialog.Close(DialogResult.Ok(true));
+        ForceReload();
+    }
+
+    private void ForceReload() => NavigationManager.NavigateTo("/task");
+
+    void Cancel() => MudDialog.Cancel();
+}

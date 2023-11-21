@@ -1,0 +1,29 @@
+﻿
+@inject NavigationManager NavigationManager
+
+<MudCard Outlined="true">
+    <MudCardContent>
+        <MudText>@Id - @TaskName</MudText>
+        <MudText Typo="Typo.body2">@TaskDescription</MudText>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton @onclick="EditTask" Variant="Variant.Filled" Color="Color.Primary">Edit</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string TaskName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TaskDescription { get; set; } = string.Empty;
+
+    public void EditTask()
+    {
+        NavigationManager.NavigateTo($"/edit-task/{Id}");
+    }
+
+}
